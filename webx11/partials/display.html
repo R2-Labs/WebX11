@@ -393,7 +393,7 @@
         }}
 
         async function setup() {{
-            const request = await fetch("/settings.json")
+            const request = await fetch("/api/webx11/settings.json")
             let response = await request.json()
             if (response['settings']) {{
                 window.settings = response.settings
@@ -411,7 +411,7 @@
 
         async function connectWebSocket() {{
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${{protocol}}//${{window.location.hostname}}:8081/ws/${{windowId}}`;
+            const wsUrl = `${{protocol}}//${{window.location.host}}/api/socket?target=webx11&display_id=${{windowId}}`;
             let numFrames = 0;
             let lastDelta = Date.now();
 
