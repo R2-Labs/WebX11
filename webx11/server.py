@@ -3,6 +3,7 @@
 Main X11 Web Display Server with HTTP API and WebTransport
 """
 
+import os
 import sys
 import atexit
 import asyncio
@@ -36,9 +37,9 @@ def handler_factory(display_manager):
 
 async def main_async():
     # Configuration
-    HTTP_PORT = 8080
+    HTTP_PORT = int(os.getenv("WEBX11_HTTP_PORT", 8080))
     WEBTRANSPORT_PORT = 4433
-    WEBSOCKET_PORT = 8081
+    WEBSOCKET_PORT = int(os.getenv("WEBX11_WEBSOCKET_PORT", 8081))
 
     print("Starting X11 Web Display Server with HTTP API...")
     print("=" * 50)
