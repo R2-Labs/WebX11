@@ -538,7 +538,6 @@
             isComposing = false;
         }});
 
-        // NEW
         function getX11Button(e) {{
             switch (e.button) {{
                 case 0: return 1; // Left Click
@@ -547,8 +546,6 @@
                 default: return e.button + 1;
             }}
         }}
-
-
 
         // Mouse Down (Handles Left, Middle, and Right Clicks)
         canvas.addEventListener('mousedown', (e) => {{
@@ -594,42 +591,6 @@
                 e.preventDefault();
             }}
         }});
-
-
-        /*
-
-        // Mouse and keyboard event handling
-        canvas.addEventListener('mousedown', (e) => {{
-            const rect = e.target.getBoundingClientRect();
-            const scaleX = e.target.width / rect.width;
-            const scaleY = e.target.height / rect.height;
-            const x = Math.round(e.offsetX * scaleX);
-            const y = Math.round(e.offsetY * scaleY);
-
-            sendMessage({{type: 'mousedown', x, y, button: 1}});
-        }});
-
-        canvas.addEventListener('mouseup', (e) => {{
-            const rect = e.target.getBoundingClientRect();
-            const scaleX = e.target.width / rect.width;
-            const scaleY = e.target.height / rect.height;
-            const x = Math.round(e.offsetX * scaleX);
-            const y = Math.round(e.offsetY * scaleY);
-            sendMessage({{type: 'mouseup', x, y, button: 1}});
-        }});
-
-        canvas.addEventListener('contextmenu', (e) => {{
-            e.preventDefault();
-            const rect = e.target.getBoundingClientRect();
-            const scaleX = e.target.width / rect.width;
-            const scaleY = e.target.height / rect.height;
-            const x = Math.round(e.offsetX * scaleX);
-            const y = Math.round(e.offsetY * scaleY);
-
-            sendMessage({{type: 'mousedown', x, y, button: 3}});
-        }});
-
-        */
 
         // More aggressive debouncing for mouse move
         const onMouseMove = debounce((e) => {{
