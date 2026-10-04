@@ -538,7 +538,16 @@
             isComposing = false;
         }});
 
-        // Mouse and keyboard event handling
+        function getX11Button(e) {{
+            switch (e.button) {{
+                case 0: return 1; // Left Click
+                case 1: return 2; // Middle Click (Scrollwheel Press)
+                case 2: return 3; // Right Click
+                default: return e.button + 1;
+            }}
+        }}
+
+        // Mouse Down (Handles Left, Middle, and Right Clicks)
         canvas.addEventListener('mousedown', (e) => {{
             const rect = e.target.getBoundingClientRect();
             const scaleX = e.target.width / rect.width;
@@ -546,27 +555,41 @@
             const x = Math.round(e.offsetX * scaleX);
             const y = Math.round(e.offsetY * scaleY);
 
-            sendMessage({{type: 'mousedown', x, y, button: 1}});
+            // Prevent native browser context menu and autoscroll mode
+            if (e.button === 1 || e.button === 2) {{
+                e.preventDefault();
+            }}
+
+            const x11Button = getX11Button(e);
+            sendMessage({{type: 'mousedown', x, y, button: x11Button}});
         }});
 
+        // Mouse Up (Handles Left, Middle, and Right Clicks)
         canvas.addEventListener('mouseup', (e) => {{
             const rect = e.target.getBoundingClientRect();
             const scaleX = e.target.width / rect.width;
             const scaleY = e.target.height / rect.height;
             const x = Math.round(e.offsetX * scaleX);
             const y = Math.round(e.offsetY * scaleY);
-            sendMessage({{type: 'mouseup', x, y, button: 1}});
+
+            if (e.button === 1 || e.button === 2) {{
+                e.preventDefault();
+            }}
+
+            const x11Button = getX11Button(e);
+            sendMessage({{type: 'mouseup', x, y, button: x11Button}});
         }});
 
+        // Prevent native context menu from opening over the canvas
         canvas.addEventListener('contextmenu', (e) => {{
             e.preventDefault();
-            const rect = e.target.getBoundingClientRect();
-            const scaleX = e.target.width / rect.width;
-            const scaleY = e.target.height / rect.height;
-            const x = Math.round(e.offsetX * scaleX);
-            const y = Math.round(e.offsetY * scaleY);
+        }});
 
-            sendMessage({{type: 'mousedown', x, y, button: 3}});
+        // Prevent Chrome/Firefox middle-click autoscroll hijacking
+        canvas.addEventListener('auxclick', (e) => {{
+            if (e.button === 1 || e.button === 2) {{
+                e.preventDefault();
+            }}
         }});
 
         // More aggressive debouncing for mouse move
