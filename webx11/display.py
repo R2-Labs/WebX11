@@ -58,6 +58,13 @@ class SingleWindowDisplay:
             # Wait for Xvfb to start
             for i in range(10):
                 time.sleep(1)
+                # Ours died (e.g. "server already active"): whatever answers
+                # on this display now is someone else's -- never draw on it.
+                if self.xvfb_process.poll() is not None:
+                    raise Exception(
+                        f"Xvfb exited on {self.display_name}: "
+                        f"{self.xvfb_process.stdout.read().decode(errors='replace')[-300:]}"
+                    )
                 try:
                     test_display = Xlib.display.Display(self.display_name)
                     test_display.close()
@@ -204,10 +211,27 @@ class SingleWindowDisplay:
         }
 
 
+def display_in_use(display_num):
+    """Whether an X server already answers on :display_num.
+
+    The container shares the host's network, so the host's displays (the
+    desktop, xrdp sessions at :10 and up) are reachable from here even though
+    their lock files are not. Asking is the only check that sees them.
+    """
+    try:
+        Xlib.display.Display(f":{display_num}").close()
+        return True
+    except Exception:
+        return False
+
+
 class DisplayManager:
+    # Well clear of the host's own displays (:0, xrdp from :10).
+    FIRST_DISPLAY = 100
+
     def __init__(self):
         self.displays = {}
-        self.next_display_num = 2
+        self.next_display_num = self.FIRST_DISPLAY
         self.next_display_id = 1
         self.threadlock = threading.Lock()
 
@@ -216,7 +240,9 @@ class DisplayManager:
         print('create_display:: width, height', width, height)
         with self.threadlock:
             display_num = self.next_display_num
-            self.next_display_num += 1
+            while display_in_use(display_num):
+                display_num += 1
+            self.next_display_num = display_num + 1
 
             display_id = self.next_display_id
             self.next_display_id += 1
